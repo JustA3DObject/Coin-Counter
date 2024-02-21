@@ -13,7 +13,9 @@ img = cv2.resize(img, (800,600))
 # cv2.createTrackbar("Threshold2", "Settings", 255, 255, empty)
 
 def preProcessing(img):
-    imgPre = cv2.GaussianBlur(img, (5,5), 5)
+
+    imgPre = cv2.addWeighted(img, 1.1, np.zeros(img.shape, img.dtype), 0, 50) 
+    imgPre = cv2.GaussianBlur(imgPre, (5,5), 5)
     # threshold1 = cv2.getTrackbarPos("Threshold1", "Settings")
     # threshold2 = cv2.getTrackbarPos("Threshold2", "Settings")
     imgPre = cv2.Canny(imgPre, 75,175)
@@ -24,8 +26,9 @@ def preProcessing(img):
     return imgPre
 
 imgPre = preProcessing(img)
+imgContours, conFound = cvzone.findContours(img, imgPre, minArea=20)
 
-stackedImage = cvzone.stackImages([img, imgPre],2,0.75)
+stackedImage = cvzone.stackImages([img, imgPre, imgContours],2,0.5)
 cv2.imshow("Imgage", stackedImage)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
