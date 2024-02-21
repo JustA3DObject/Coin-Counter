@@ -1,12 +1,25 @@
 import cv2
 import cvzone
+import numpy as np
 
-img = cv2.imread("test_images\\20240221_192151.jpg")
+img = cv2.imread("test_images\\20240221_202734.jpg")
 img = cv2.resize(img, (800,600))
 
+# def empty(a):
+#     pass
+# cv2.namedWindow("Settings")
+# cv2.resizeWindow("Settings", 640,240)
+# cv2.createTrackbar("Threshold1", "Settings", 111, 255, empty)
+# cv2.createTrackbar("Threshold2", "Settings", 255, 255, empty)
+
 def preProcessing(img):
-    imgPre = cv2.GaussianBlur(img, (5,5), 4)
-    imgPre = cv2.Canny(imgPre, 150,200)
+    imgPre = cv2.GaussianBlur(img, (5,5), 5)
+    # threshold1 = cv2.getTrackbarPos("Threshold1", "Settings")
+    # threshold2 = cv2.getTrackbarPos("Threshold2", "Settings")
+    imgPre = cv2.Canny(imgPre, 75,175)
+    kernel = np.ones((3,3), np.uint8)
+    imgPre = cv2.dilate(imgPre, kernel, iterations=2)
+    imgPre = cv2.morphologyEx(imgPre, cv2.MORPH_CLOSE, kernel)
 
     return imgPre
 
