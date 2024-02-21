@@ -10,7 +10,7 @@ def preProcessing(img):
 
 imgPre = preProcessing(img)
 
-cv2.imshow("Img", img)
-cv2.imshow("ImgPre", imgPre)
+stackedImage = cvzone.stackImages([img, imgPre],2,0.75)
+cv2.imshow("Imgage", stackedImage)
 cv2.waitKey(0)
 cv2.destroyAllWindows()
