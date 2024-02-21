@@ -6,6 +6,8 @@ img = cv2.resize(img, (800,600))
 
 def preProcessing(img):
     imgPre = cv2.GaussianBlur(img, (5,5), 4)
+    imgPre = cv2.Canny(imgPre, 150,200)
+
     return imgPre
 
 imgPre = preProcessing(img)
