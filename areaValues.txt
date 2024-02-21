@@ -1,0 +1,8 @@
+1rupee_v1 = 8186.5
+1rupee_v2 = 8490.5
+1rupee_v3 = 9863.5
+2rupee_v1 = 9140.5
+5rupee_v1 = 6537.5
+5rupee_v2 = 12627.0
+5rupee_v3 = 12973.0
+10rupee_v1 = 13676.5
