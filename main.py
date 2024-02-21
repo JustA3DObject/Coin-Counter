@@ -1,9 +1,13 @@
 import cv2
 import cvzone
-import numpy as np
+import requests 
+import numpy as np 
+import imutils 
 
-img = cv2.imread("test_images\\20240221_202713.jpg")
-img = cv2.resize(img, (800,600))
+# Replace the below URL with your own. Make sure to add "/shot.jpg" at last. 
+url = "http://192.168.1.8:8080/shot.jpg"
+
+totalMoney = 0
 
 # def empty(a):
 #     pass
@@ -18,26 +22,42 @@ def preProcessing(img):
     imgPre = cv2.GaussianBlur(imgPre, (5,5), 5)
     # threshold1 = cv2.getTrackbarPos("Threshold1", "Settings")
     # threshold2 = cv2.getTrackbarPos("Threshold2", "Settings")
-    imgPre = cv2.Canny(imgPre, 75,175)
+    imgPre = cv2.Canny(imgPre, 60,150)
     kernel = np.ones((3,3), np.uint8)
-    imgPre = cv2.dilate(imgPre, kernel, iterations=2)
+    imgPre = cv2.dilate(imgPre, kernel, iterations=1)
     imgPre = cv2.morphologyEx(imgPre, cv2.MORPH_CLOSE, kernel)
 
     return imgPre
 
-imgPre = preProcessing(img)
-imgContours, conFound = cvzone.findContours(img, imgPre, minArea=20)
+# While loop to continuously fetching data from the Url 
+while True: 
+    img_resp = requests.get(url) 
+    img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8) 
+    img = cv2.imdecode(img_arr, -1) 
 
-if conFound:
-    for contour in conFound:
-        peri = cv2.arcLength(contour['cnt'], True)
-        approx = cv2.approxPolyDP(contour['cnt'], 0.02*peri, True)
+    img = imutils.resize(img, width=800, height=600) 
+    imgPre = preProcessing(img)
+    imgContours, conFound = cvzone.findContours(img, imgPre, minArea=20)
 
-        if len(approx) > 6:
-            print(contour['area'])
+    if conFound:
+        for contour in conFound:
+            peri = cv2.arcLength(contour['cnt'], True)
+            approx = cv2.approxPolyDP(contour['cnt'], 0.02*peri, True)
 
-stackedImage = cvzone.stackImages([img, imgPre, imgContours],2,0.5)
-cv2.imshow("Image", stackedImage)
+            if len(approx) > 6:
+                area = contour['area']
+                print(area)
+                
+                # if area
 
-cv2.waitKey(0)
+    stackedImage = cvzone.stackImages([img, imgPre, imgContours],2,0.5)
+    cv2.imshow("Image", stackedImage)
+
+    # Press Esc key to exit 
+    if cv2.waitKey(1) == 27: 
+        break
 cv2.destroyAllWindows()
+
+
+
+
