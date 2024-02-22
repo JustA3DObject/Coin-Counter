@@ -5,7 +5,7 @@ import numpy as np
 import imutils 
 
 # Replace the below URL with your own. Make sure to add "/shot.jpg" at last. 
-url = "http://192.168.1.8:8080/shot.jpg"
+url = "http://192.168.1.5:8080//shot.jpg"
 
 totalMoney = 0
 
@@ -18,12 +18,12 @@ totalMoney = 0
 
 def preProcessing(img):
 
-    imgPre = cv2.addWeighted(img, 1.1, np.zeros(img.shape, img.dtype), 0, 50) 
+    imgPre = cv2.addWeighted(img, 1.2, np.zeros(img.shape, img.dtype), 0, 45) 
     imgPre = cv2.GaussianBlur(imgPre, (5,5), 5)
     # threshold1 = cv2.getTrackbarPos("Threshold1", "Settings")
     # threshold2 = cv2.getTrackbarPos("Threshold2", "Settings")
-    imgPre = cv2.Canny(imgPre, 60,150)
-    kernel = np.ones((3,3), np.uint8)
+    imgPre = cv2.Canny(imgPre, 60,130)
+    kernel = np.ones((4,4), np.uint8)
     imgPre = cv2.dilate(imgPre, kernel, iterations=1)
     imgPre = cv2.morphologyEx(imgPre, cv2.MORPH_CLOSE, kernel)
 
@@ -31,14 +31,15 @@ def preProcessing(img):
 
 # While loop to continuously fetching data from the Url 
 while True: 
-    img_resp = requests.get(url) 
-    img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8) 
+    img_resp = requests.get(url)
+    img_arr = np.array(bytearray(img_resp.content), dtype=np.uint8)
     img = cv2.imdecode(img_arr, -1) 
 
-    img = imutils.resize(img, width=800, height=600) 
+    img = imutils.resize(img, width=800, height=600)
     imgPre = preProcessing(img)
     imgContours, conFound = cvzone.findContours(img, imgPre, minArea=20)
 
+    totalMoney = 0
     if conFound:
         for contour in conFound:
             peri = cv2.arcLength(contour['cnt'], True)
@@ -46,9 +47,25 @@ while True:
 
             if len(approx) > 6:
                 area = contour['area']
+
                 print(area)
-                
-                # if area
+
+                if area < 9000:
+                    totalMoney += 1
+                elif 10700 < area < 10800:
+                    totalMoney += 1
+                elif 10500 < area < 10850:
+                    totalMoney += 1
+                elif 10600 < area < 10900:
+                    totalMoney += 2
+                elif 9000 < area < 10800:
+                    totalMoney += 5
+                elif 11000 < area < 12000:
+                    totalMoney += 5
+                elif area > 12000:
+                    totalMoney += 10
+        # print(totalMoney)
+
 
     stackedImage = cvzone.stackImages([img, imgPre, imgContours],2,0.5)
     cv2.imshow("Image", stackedImage)
