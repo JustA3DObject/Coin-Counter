@@ -3,11 +3,15 @@ import cvzone
 import requests 
 import numpy as np 
 import imutils 
+from cvzone.ColorModule import ColorFinder
 
 # Replace the below URL with your own. Make sure to add "/shot.jpg" at last. 
 url = "http://192.168.1.5:8080//shot.jpg"
 
 totalMoney = 0
+
+myColorFinder = ColorFinder(False)
+hsvVals = {'hmin': 0, 'smin': 47, 'vmin': 49, 'hmax': 32, 'smax': 209, 'vmax': 255}
 
 # def empty(a):
 #     pass
@@ -49,26 +53,27 @@ while True:
                 area = contour['area']
 
                 # print(area)
+                x,y,w,h = contour['bbox']
+                imgCrop = img[y:y+h, x:x+w]
+                # cv2.imshow(str(count), imgCrop)
+                imgColor, mask = myColorFinder.update(imgCrop, hsvVals)
+                whitePixelCount = cv2.countNonZero(mask)
+                # print(whitePixelCount)
 
-                if area < 9000:
+                if 8000 < area < 12000 and whitePixelCount > 500:
+                    totalMoney += 5
+                elif area < 10600:
                     totalMoney += 1
-                elif 10700 < area < 10800:
-                    totalMoney += 1
-                elif 10500 < area < 10850:
-                    totalMoney += 1
-                elif 10600 < area < 10900:
+                elif 10600 < area < 12000:
                     totalMoney += 2
-                elif 9000 < area < 10800:
-                    totalMoney += 5
-                elif 11000 < area < 12000:
-                    totalMoney += 5
                 elif area > 12000:
                     totalMoney += 10
-        # print(totalMoney)
+            # print(totalMoney)
 
-    stackedImage = cvzone.stackImages([img, imgPre, imgContours],2,0.5)
-    cvzone.putTextRect(stackedImage, f'Rs. {totalMoney}', (50,50))
-    cv2.imshow("Image", stackedImage)
+    # stackedImage = cvzone.stackImages([img, imgPre, imgContours],2,0.5)
+    cvzone.putTextRect(imgContours, f'Rs. {totalMoney}', (50,50))
+    cv2.imshow("Image", imgContours)
+    # cv2.imshow("ImageColor", imgColor)
 
     # Press Esc key to exit 
     if cv2.waitKey(1) == 27: 
