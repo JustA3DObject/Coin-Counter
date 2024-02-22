@@ -48,7 +48,7 @@ while True:
             if len(approx) > 6:
                 area = contour['area']
 
-                print(area)
+                # print(area)
 
                 if area < 9000:
                     totalMoney += 1
@@ -66,8 +66,8 @@ while True:
                     totalMoney += 10
         # print(totalMoney)
 
-
     stackedImage = cvzone.stackImages([img, imgPre, imgContours],2,0.5)
+    cvzone.putTextRect(stackedImage, f'Rs. {totalMoney}', (50,50))
     cv2.imshow("Image", stackedImage)
 
     # Press Esc key to exit 
