@@ -9,3 +9,4 @@ requests==2.31.0
 urllib3==2.2.1
 customtkinter==5.2.2
 tkinter==8.6
+pillow==10.2.0
